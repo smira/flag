@@ -89,6 +89,8 @@ func (b *boolValue) Set(s string) error {
 	return err
 }
 
+func (b *boolValue) Get() interface{} { return *b }
+
 func (b *boolValue) String() string { return fmt.Sprintf("%v", *b) }
 
 // -- int Value
@@ -104,6 +106,8 @@ func (i *intValue) Set(s string) error {
 	*i = intValue(v)
 	return err
 }
+
+func (i *intValue) Get() interface{} { return *i }
 
 func (i *intValue) String() string { return fmt.Sprintf("%v", *i) }
 
@@ -121,6 +125,8 @@ func (i *int64Value) Set(s string) error {
 	return err
 }
 
+func (i *int64Value) Get() interface{} { return *i }
+
 func (i *int64Value) String() string { return fmt.Sprintf("%v", *i) }
 
 // -- uint Value
@@ -136,6 +142,8 @@ func (i *uintValue) Set(s string) error {
 	*i = uintValue(v)
 	return err
 }
+
+func (i *uintValue) Get() interface{} { return *i }
 
 func (i *uintValue) String() string { return fmt.Sprintf("%v", *i) }
 
@@ -153,6 +161,8 @@ func (i *uint64Value) Set(s string) error {
 	return err
 }
 
+func (i *uint64Value) Get() interface{} { return *i }
+
 func (i *uint64Value) String() string { return fmt.Sprintf("%v", *i) }
 
 // -- string Value
@@ -167,6 +177,8 @@ func (s *stringValue) Set(val string) error {
 	*s = stringValue(val)
 	return nil
 }
+
+func (s *stringValue) Get() interface{} { return *s }
 
 func (s *stringValue) String() string { return fmt.Sprintf("%s", *s) }
 
@@ -184,6 +196,8 @@ func (f *float64Value) Set(s string) error {
 	return err
 }
 
+func (f *float64Value) Get() interface{} { return *f }
+
 func (f *float64Value) String() string { return fmt.Sprintf("%v", *f) }
 
 // -- time.Duration Value
@@ -200,6 +214,8 @@ func (d *durationValue) Set(s string) error {
 	return err
 }
 
+func (d *durationValue) Get() interface{} { return *d }
+
 func (d *durationValue) String() string { return (*time.Duration)(d).String() }
 
 // Value is the interface to the dynamic value stored in a flag.
@@ -207,6 +223,7 @@ func (d *durationValue) String() string { return (*time.Duration)(d).String() }
 type Value interface {
 	String() string
 	Set(string) error
+	Get() interface{}
 }
 
 // ErrorHandling defines how to handle flag parsing errors.
