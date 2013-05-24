@@ -6,13 +6,14 @@ package flag_test
 
 import (
 	"bytes"
-	. "flag"
 	"fmt"
 	"os"
 	"sort"
 	"strings"
 	"testing"
 	"time"
+
+	. "github.com/gonuts/flag"
 )
 
 var (
@@ -190,6 +191,8 @@ func (f *flagVar) Set(value string) error {
 	*f = append(*f, value)
 	return nil
 }
+
+func (f *flagVar) Get() interface{} { return []string(*f) }
 
 func TestUserDefined(t *testing.T) {
 	var flags FlagSet
