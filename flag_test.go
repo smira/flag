@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/gonuts/flag"
+	. "github.com/smira/flag"
 )
 
 var (

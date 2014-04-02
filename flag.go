@@ -67,6 +67,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"reflect"
 	"sort"
 	"strconv"
 	"time"
@@ -813,4 +814,22 @@ func NewFlagSet(name string, errorHandling ErrorHandling) *FlagSet {
 func (f *FlagSet) Init(name string, errorHandling ErrorHandling) {
 	f.name = name
 	f.errorHandling = errorHandling
+}
+
+// Merge combines two FlagSets, adding all flags from other
+func (f *FlagSet) Merge(other *FlagSet) {
+	for name, flag := range other.formal {
+		existing, alreadythere := f.formal[name]
+		if alreadythere {
+			if reflect.TypeOf(existing.Value) != reflect.TypeOf(flag.Value) {
+				panic(fmt.Sprintf("unable to merge flag %s: %s != %s", name, reflect.TypeOf(existing.Value).String(),
+					reflect.TypeOf(flag.Value).String()))
+			}
+		} else {
+			if f.formal == nil {
+				f.formal = make(map[string]*Flag)
+			}
+			f.formal[name] = flag
+		}
+	}
 }
