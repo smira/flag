@@ -680,7 +680,7 @@ func (f *FlagSet) usage() {
 }
 
 // parseOne parses one flag. It returns whether a flag was seen.
-func (f *FlagSet) parseOne() (bool, error) {
+func (f *FlagSet) parseOne(setValue bool) (bool, error) {
 	if len(f.args) == 0 {
 		return false, nil
 	}
@@ -723,12 +723,14 @@ func (f *FlagSet) parseOne() (bool, error) {
 		return false, f.failf("flag provided but not defined: -%s", name)
 	}
 	if fv, ok := flag.Value.(*boolValue); ok { // special case: doesn't need an arg
-		if has_value {
-			if err := fv.Set(value); err != nil {
-				f.failf("invalid boolean value %q for  -%s: %v", value, name, err)
+		if setValue {
+			if has_value {
+				if err := fv.Set(value); err != nil {
+					f.failf("invalid boolean value %q for  -%s: %v", value, name, err)
+				}
+			} else {
+				fv.Set("true")
 			}
-		} else {
-			fv.Set("true")
 		}
 	} else {
 		// It must have a value, which might be the next argument.
@@ -740,8 +742,10 @@ func (f *FlagSet) parseOne() (bool, error) {
 		if !has_value {
 			return false, f.failf("flag needs an argument: -%s", name)
 		}
-		if err := flag.Value.Set(value); err != nil {
-			return false, f.failf("invalid value %q for flag -%s: %v", value, name, err)
+		if setValue {
+			if err := flag.Value.Set(value); err != nil {
+				return false, f.failf("invalid value %q for flag -%s: %v", value, name, err)
+			}
 		}
 	}
 	if f.actual == nil {
@@ -755,11 +759,11 @@ func (f *FlagSet) parseOne() (bool, error) {
 // include the command name.  Must be called after all flags in the FlagSet
 // are defined and before flags are accessed by the program.
 // The return value will be ErrHelp if -help was set but not defined.
-func (f *FlagSet) Parse(arguments []string) error {
+func (f *FlagSet) Parse(arguments []string, setValue bool) error {
 	f.parsed = true
 	f.args = arguments
 	for {
-		seen, err := f.parseOne()
+		seen, err := f.parseOne(setValue)
 		if seen {
 			continue
 		}
@@ -787,7 +791,7 @@ func (f *FlagSet) Parsed() bool {
 // after all flags are defined and before flags are accessed by the program.
 func Parse() {
 	// Ignore errors; commandLine is set for ExitOnError.
-	commandLine.Parse(os.Args[1:])
+	commandLine.Parse(os.Args[1:], true)
 }
 
 // Parsed returns true if the command-line flags have been parsed.

@@ -97,7 +97,7 @@ func TestEverything(t *testing.T) {
 func TestUsage(t *testing.T) {
 	called := false
 	ResetForTesting(func() { called = true })
-	if CommandLine().Parse([]string{"-x"}) == nil {
+	if CommandLine().Parse([]string{"-x"}, true) == nil {
 		t.Error("parse did not fail for unknown flag")
 	}
 	if !called {
@@ -131,7 +131,7 @@ func testParse(f *FlagSet, t *testing.T) {
 		"-duration", "2m",
 		extra,
 	}
-	if err := f.Parse(args); err != nil {
+	if err := f.Parse(args, true); err != nil {
 		t.Fatal(err)
 	}
 	if !f.Parsed() {
@@ -199,7 +199,7 @@ func TestUserDefined(t *testing.T) {
 	flags.Init("test", ContinueOnError)
 	var v flagVar
 	flags.Var(&v, "v", "usage")
-	if err := flags.Parse([]string{"-v", "1", "-v", "2", "-v=3"}); err != nil {
+	if err := flags.Parse([]string{"-v", "1", "-v", "2", "-v=3"}, true); err != nil {
 		t.Error(err)
 	}
 	if len(v) != 3 {
@@ -216,7 +216,7 @@ func TestSetOutput(t *testing.T) {
 	var buf bytes.Buffer
 	flags.SetOutput(&buf)
 	flags.Init("test", ContinueOnError)
-	flags.Parse([]string{"-unknown"})
+	flags.Parse([]string{"-unknown"}, true)
 	if out := buf.String(); !strings.Contains(out, "-unknown") {
 		t.Logf("expected output mentioning unknown; got %q", out)
 	}
@@ -230,7 +230,7 @@ func TestChangingArgs(t *testing.T) {
 	defer func() { os.Args = oldArgs }()
 	os.Args = []string{"cmd", "-before", "subcmd", "-after", "args"}
 	before := Bool("before", false, "")
-	if err := CommandLine().Parse(os.Args[1:]); err != nil {
+	if err := CommandLine().Parse(os.Args[1:], true); err != nil {
 		t.Fatal(err)
 	}
 	cmd := Arg(0)
@@ -252,7 +252,7 @@ func TestHelp(t *testing.T) {
 	var flag bool
 	fs.BoolVar(&flag, "flag", false, "regular flag")
 	// Regular flag invocation should work
-	err := fs.Parse([]string{"-flag=true"})
+	err := fs.Parse([]string{"-flag=true"}, true)
 	if err != nil {
 		t.Fatal("expected no error; got ", err)
 	}
@@ -264,7 +264,7 @@ func TestHelp(t *testing.T) {
 		helpCalled = false // reset for next test
 	}
 	// Help flag should work as expected.
-	err = fs.Parse([]string{"-help"})
+	err = fs.Parse([]string{"-help"}, true)
 	if err == nil {
 		t.Fatal("error expected")
 	}
@@ -278,7 +278,7 @@ func TestHelp(t *testing.T) {
 	var help bool
 	fs.BoolVar(&help, "help", false, "help flag")
 	helpCalled = false
-	err = fs.Parse([]string{"-help"})
+	err = fs.Parse([]string{"-help"}, true)
 	if err != nil {
 		t.Fatal("expected no error for defined -help; got ", err)
 	}
